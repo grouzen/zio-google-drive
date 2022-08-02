@@ -7,13 +7,14 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 import zio._
 
+import java.io.IOException
 import java.util
 
 package object client {
 
-  def driverLive(appName: String): ZLayer[Any, Throwable, Drive] =
+  def driverLive(appName: String): ZLayer[Any, IOException, Drive] =
     ZLayer.fromZIO(
-      ZIO.attempt {
+      ZIO.attemptBlockingIO {
         val credentials        = GoogleCredentials.getApplicationDefault().createScoped(util.Arrays.asList(DriveScopes.DRIVE))
         val requestInitializer = new HttpCredentialsAdapter(credentials)
 
