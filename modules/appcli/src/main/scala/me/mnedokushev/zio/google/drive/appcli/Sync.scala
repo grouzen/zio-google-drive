@@ -1,5 +1,6 @@
 package me.mnedokushev.zio.google.drive.appcli
 
+import me.mnedokushev.zio.google.drive.client.FileId
 import zio._
 import zio.nio.file.Path
 

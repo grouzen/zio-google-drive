@@ -15,7 +15,7 @@ object Dependencies {
   lazy val zioTest    = org.zio %% "zio-test"     % version.zio
   lazy val zioTestSbt = org.zio %% "zio-test-sbt" % version.zio
   lazy val zioNio     = org.zio %% "zio-nio"      % version.zio
-  lazy val zioPrelude = org.zio %% "zio-prelude"  % "1.0.0-RC5"
+  lazy val zioPrelude = org.zio %% "zio-prelude"  % "1.0.0-RC15" // supports zio2 since 1.0.0-RC15
 
   lazy val googleApiClient             = s"${org.google}.api-client"   % "google-api-client"               % "1.33.0"
   lazy val googleApiServicesDrive      = s"${org.google}.apis"         % "google-api-services-drive"       % "v3-rev20211107-1.32.1"
@@ -25,27 +25,29 @@ object Dependencies {
 
   lazy val client = Seq(
     zio,
-    zioTest    % Test,
-    zioTestSbt % Test,
-    zioNio     % Test,
+    zioNio,
+    zioPrelude,
     googleApiClient,
     googleApiServicesDrive,
     googleOauthClientJetty,
     googleOauthClient,
-    googleAuthLibraryOauth2Http
+    googleAuthLibraryOauth2Http,
+    zioTest    % Test,
+    zioTestSbt % Test,
+    zioPrelude % Test
   )
 
   lazy val appcli = Seq(
     zio,
-    zioPrelude,
     zioNio,
-    zioTest    % Test,
-    zioTestSbt % Test,
+    zioPrelude,
     googleApiClient,
     googleApiServicesDrive,
     googleOauthClientJetty,
     googleOauthClient,
-    googleAuthLibraryOauth2Http
+    googleAuthLibraryOauth2Http,
+    zioTest    % Test,
+    zioTestSbt % Test
   )
 
 }

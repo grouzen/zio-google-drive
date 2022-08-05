@@ -6,6 +6,7 @@ import zio.nio.file.Path
 import zio.test._
 import zio.test.TestAspect._
 import Fixtures._
+import syntax._
 
 import java.io.{ ByteArrayOutputStream, FileNotFoundException, IOException }
 
@@ -20,7 +21,7 @@ object FilesSpec extends ZIOSpecDefault with Utils {
         for {
           created           <- Files.create(filePath1, fileName1)
           localContent      <- getFileContent(filePath1)
-          downloadedContent <- downloadContent(created.getId)
+          downloadedContent <- downloadContent(created.getFileId)
         } yield assertTrue(
           created.getId.nonEmpty,
           localContent.sameElements(downloadedContent)
@@ -37,8 +38,8 @@ object FilesSpec extends ZIOSpecDefault with Utils {
       },
       test("create file in a given directory") {
         for {
-          folder  <- Folders.create(folderPath, folderName)
-          created <- Files.create(filePath1, fileName1, Some(folder.getId))
+          folder  <- Folders.create(folderName)
+          created <- Files.create(filePath1, fileName1, Some(folder.getFileId))
         } yield assertTrue(
           folder.getId.nonEmpty,
           created.getId.nonEmpty,
@@ -53,7 +54,7 @@ object FilesSpec extends ZIOSpecDefault with Utils {
         for {
           created       <- Files.create(filePath1, fileName1)
           inputContent  <- getFileContent(filePath1)
-          outputContent <- downloadContent(created.getId)
+          outputContent <- downloadContent(created.getFileId)
         } yield assertTrue(inputContent.sameElements(outputContent))
       },
       test("list files") {
@@ -68,7 +69,7 @@ object FilesSpec extends ZIOSpecDefault with Utils {
         for {
           forDelete  <- Files.create(filePath1, fileName1)
           listBefore <- Files.list()
-          _          <- Files.delete(forDelete.getId)
+          _          <- Files.delete(forDelete.getFileId)
           listAfter  <- Files.list()
         } yield assertTrue(
           listBefore != listAfter,
@@ -79,23 +80,23 @@ object FilesSpec extends ZIOSpecDefault with Utils {
       test("update file") {
         for {
           original        <- Files.create(filePath1, fileName1)
-          originalContent <- downloadContent(original.getId)
-          _               <- Files.update(original.getId, filePath2)
-          updatedContent  <- downloadContent(original.getId)
+          originalContent <- downloadContent(original.getFileId)
+          _               <- Files.update(original.getFileId, filePath2)
+          updatedContent  <- downloadContent(original.getFileId)
         } yield assertTrue(!updatedContent.sameElements(originalContent))
       }
     ).provideLayer(layer) @@ afterAll(cleanup(layer))
 
-  private def getFileContent(filePath: String): ZIO[Any, IOException, Array[Byte]] =
+  private def getFileContent(filePath: Path): ZIO[Any, IOException, Array[Byte]] =
     ZIO.scoped {
       for {
-        createdFileChannel <- FileChannel.open(Path(filePath))
+        createdFileChannel <- FileChannel.open(filePath)
         createdSize        <- createdFileChannel.size
         createdChunk       <- createdFileChannel.flatMapBlocking(_.readChunk(createdSize.toInt))
       } yield createdChunk.toArray[Byte]
     }
 
-  private def downloadContent(fileId: String): ZIO[Files, IOException, Array[Byte]] = {
+  private def downloadContent(fileId: FileId): ZIO[Files, IOException, Array[Byte]] = {
     val os = new ByteArrayOutputStream()
 
     Files.downloadTo(fileId, os).as(os.toByteArray)
