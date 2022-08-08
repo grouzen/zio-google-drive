@@ -4,6 +4,7 @@ import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import zio._
 import com.google.api.services.drive.model.File
+import zio.macros.accessible
 
 import java.io
 import java.io.{ IOException, OutputStream }
@@ -12,6 +13,7 @@ import zio.nio.file.Path
 import java.util.Collections
 import scala.jdk.CollectionConverters.ListHasAsScala
 
+@accessible
 trait Files {
   def create(filePath: Path, name: String, parentFolderId: Option[FileId] = None): IO[IOException, File]
   def downloadTo(fileId: FileId, outputStream: OutputStream): IO[IOException, Unit]
@@ -26,21 +28,6 @@ object Files {
     ZLayer {
       ZIO.serviceWith[Drive](FilesLive)
     }
-
-  def create(filePath: Path, name: String, parentFolderId: Option[FileId] = None): ZIO[Files, IOException, File] =
-    ZIO.serviceWithZIO[Files](_.create(filePath, name, parentFolderId))
-
-  def downloadTo(fileId: FileId, outputStream: OutputStream): ZIO[Files, IOException, Unit] =
-    ZIO.serviceWithZIO[Files](_.downloadTo(fileId, outputStream))
-
-  def list(): ZIO[Files, IOException, List[File]] =
-    ZIO.serviceWithZIO[Files](_.list())
-
-  def delete(fileId: FileId): ZIO[Files, IOException, Unit] =
-    ZIO.serviceWithZIO[Files](_.delete(fileId))
-
-  def update(fileId: FileId, filePath: Path): ZIO[Files, IOException, Unit] =
-    ZIO.serviceWithZIO[Files](_.update(fileId, filePath))
 
 }
 

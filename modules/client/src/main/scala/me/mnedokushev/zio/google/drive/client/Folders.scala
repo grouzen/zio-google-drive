@@ -3,13 +3,13 @@ package me.mnedokushev.zio.google.drive.client
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import zio._
-import zio.nio.file.Path
+import zio.macros.accessible
 
 import java.io.IOException
 import java.util.Collections
-
 import scala.jdk.CollectionConverters.ListHasAsScala
 
+@accessible
 trait Folders {
   def create(name: String, parentFolderId: Option[FileId] = None): IO[IOException, File]
   def list(): IO[IOException, List[File]]
@@ -21,12 +21,6 @@ object Folders {
     ZLayer {
       ZIO.serviceWith[Drive](FoldersLive)
     }
-
-  def create(name: String, parentFolderId: Option[FileId] = None): ZIO[Folders, IOException, File] =
-    ZIO.serviceWithZIO[Folders](_.create(name, parentFolderId))
-
-  def list(): ZIO[Folders, IOException, List[File]] =
-    ZIO.serviceWithZIO[Folders](_.list)
 
 }
 

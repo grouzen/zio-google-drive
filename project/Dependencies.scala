@@ -15,6 +15,7 @@ object Dependencies {
   lazy val zioTest    = org.zio %% "zio-test"     % version.zio
   lazy val zioTestSbt = org.zio %% "zio-test-sbt" % version.zio
   lazy val zioNio     = org.zio %% "zio-nio"      % version.zio
+  lazy val zioMacros  = org.zio %% "zio-macros"   % version.zio
   lazy val zioPrelude = org.zio %% "zio-prelude"  % "1.0.0-RC15" // supports zio2 since 1.0.0-RC15
 
   lazy val googleApiClient             = s"${org.google}.api-client"   % "google-api-client"               % "1.33.0"
@@ -27,6 +28,7 @@ object Dependencies {
     zio,
     zioNio,
     zioPrelude,
+    zioMacros,
     googleApiClient,
     googleApiServicesDrive,
     googleOauthClientJetty,
